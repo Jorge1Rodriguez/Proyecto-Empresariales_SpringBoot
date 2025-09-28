@@ -87,7 +87,7 @@ public class ServicioInstrumento implements IServicioInstrumento {
 
         buscarInstrumento(instrumento.getCodigo())
                 .ifPresent(i -> {
-                    throw new IllegalArgumentException("Ya existe un instrumento con este código");
+                    throw new IllegalStateException("Ya existe un instrumento con este código");
                 });
 
         if(instrumento instanceof Guitarra guitarra) {
@@ -150,8 +150,6 @@ public class ServicioInstrumento implements IServicioInstrumento {
      *
      * @param codigo Código único del instrumento.
      * @return El instrumento encontrado.
-     * @throws NoSuchElementException Si no existe ningún instrumento con el
-     * código proporcionado.
      */
     @Override
     public Optional<Instrumento> buscarInstrumento(String codigo) {
@@ -194,4 +192,43 @@ public class ServicioInstrumento implements IServicioInstrumento {
             throw new NoSuchElementException("No se encontró un instrumento con el código: " + codigo);
         }
     }
+
+    @Override
+    public void agregarFundas(String codigoGuitarra, List<Funda> fundas)
+    {
+        Optional<Instrumento> instrumento = buscarInstrumento(codigoGuitarra);
+        if(instrumento.isPresent())
+        {
+            if (instrumento.get() instanceof Guitarra guitarra) {
+                guitarra.agregarFundas(fundas);
+            }
+            throw new IllegalArgumentException("El codigo debe ser de una guitarra");
+        }
+    }
+
+    @Override
+    public void editarFunda(String codigoGuitarra, String codigoFunda, Funda funda) {
+        Optional<Instrumento> instrumento = buscarInstrumento(codigoGuitarra);
+        if(instrumento.isPresent())
+        {
+            if (instrumento.get() instanceof Guitarra guitarra) {
+                guitarra.editarFunda(codigoFunda, funda);
+            }
+            throw new IllegalArgumentException("El codigo debe ser de una guitarra");
+        }
+    }
+
+    @Override
+    public void eliminarFunda(String codigoGuitarra, String codigoFunda) {
+        Optional<Instrumento> instrumento = buscarInstrumento(codigoGuitarra);
+        if(instrumento.isPresent())
+        {
+            if (instrumento.get() instanceof Guitarra guitarra) {
+                guitarra.eliminarFunda(codigoFunda);
+            }
+            throw new IllegalArgumentException("El codigo debe ser de una guitarra");
+        }
+    }
+
+
 }

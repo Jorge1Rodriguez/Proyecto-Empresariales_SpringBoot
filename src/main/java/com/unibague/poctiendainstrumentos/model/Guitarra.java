@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -17,6 +16,7 @@ import java.util.stream.Stream;
  * @author jorge
  */
 @Data
+@NoArgsConstructor
 public class Guitarra extends Instrumento {
 
     private String tipo;
@@ -40,16 +40,15 @@ public class Guitarra extends Instrumento {
         return precioBase;
     }
 
-    public void agregarFunda(Funda funda)
-    {
-        if (funda == null)
-        {
-            throw new IllegalArgumentException("La funda no puede ser nula");
+    public void agregarFundas(List<Funda> fundas) {
+        if (fundas == null) return;
+        else {
+            this.fundas = new ArrayList<>(
+                    Stream.concat(this.fundas.stream(), fundas.stream())
+                            .distinct()
+                            .toList()
+            );
         }
-        buscarFunda(funda.getCodigo()).ifPresent(i -> {
-            throw new IllegalArgumentException("Ya existe una funda con este código");
-        });
-        fundas.add(funda);
     }
 
     public Optional<Funda> buscarFunda(String codigo) {
@@ -87,19 +86,6 @@ public class Guitarra extends Instrumento {
     //getters y setters
     public List<Funda> getFundas() {
         return fundas == null ? Collections.emptyList() : Collections.unmodifiableList(fundas);
-    }
-
-
-    public void setFundas(List<Funda> fundas) {
-        if (fundas == null) {
-            this.fundas = new ArrayList<>();
-        } else {
-            this.fundas = new ArrayList<>(
-                    Stream.concat(getFundas().stream(), fundas.stream())
-                            .distinct()
-                            .toList()
-            );
-        }
     }
 
 

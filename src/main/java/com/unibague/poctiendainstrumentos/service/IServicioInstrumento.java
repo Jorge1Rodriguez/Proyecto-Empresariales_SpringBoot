@@ -4,6 +4,7 @@
  */
 package com.unibague.poctiendainstrumentos.service;
 
+import com.unibague.poctiendainstrumentos.model.Funda;
 import com.unibague.poctiendainstrumentos.model.Guitarra;
 import com.unibague.poctiendainstrumentos.model.Instrumento;
 import com.unibague.poctiendainstrumentos.model.Teclado;
@@ -16,18 +17,24 @@ import java.util.Optional;
  */
 public interface IServicioInstrumento {
 
-    public void agregarInstrumento(Instrumento instrumento);
+    void agregarInstrumento(Instrumento instrumento);
 
-    public List<Instrumento> listarInstrumentos();
+    List<Instrumento> listarInstrumentos();
 
-    public List<Guitarra> listarGuitarras();
+    List<Guitarra> listarGuitarras();
 
-    public List<Teclado> listarTeclados();
+    List<Teclado> listarTeclados();
 
-    public Optional<Instrumento> buscarInstrumento(String codigo);
+    Optional<Instrumento> buscarInstrumento(String codigo);
 
-    public void editarInstrumento(String codigo, Instrumento instrumento);
+    void editarInstrumento(String codigo, Instrumento instrumento);
 
-    public void eliminarInstrumento(String codigo);
+    void eliminarInstrumento(String codigo);
+
+    void agregarFundas(String codigoGuitarra, List<Funda> fundas);
+
+    void editarFunda(String codigoGuitarra, String codigoFunda, Funda funda);
+
+    void eliminarFunda(String codigoGuitarra, String CodigoFunda);
 
 }

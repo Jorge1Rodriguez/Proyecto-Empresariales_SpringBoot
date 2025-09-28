@@ -8,9 +8,7 @@ import com.unibague.poctiendainstrumentos.model.Teclado;
 import com.unibague.poctiendainstrumentos.service.IServicioInstrumento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,53 +32,32 @@ public class InstrumentoController
     @PostMapping
     public ResponseEntity<ApiResponse> agregarInstrumento(@RequestBody Instrumento instrumento)
     {
-        try
-        {
             servicioInstrumento.agregarInstrumento(instrumento);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse(false, "Instrumento agregado correctamente"));
-        }
-        catch (IllegalArgumentException e)
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).
-                    body(new ApiResponse(true, e.getMessage()));
-        }
     }
 
     @GetMapping
-    public ResponseEntity<?> listarInstrumentos()
+    public ResponseEntity<List<Instrumento>> listarInstrumentos()
     {
         List<Instrumento> listaInstrumentos= servicioInstrumento.listarInstrumentos();
-        if (!listaInstrumentos.isEmpty())
-        {
-            return ResponseEntity.ok(listaInstrumentos);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse(true, "No hay Instrumentos"));
+        return ResponseEntity.ok(listaInstrumentos);
     }
 
     @GetMapping(value = "/guitarras")
-    public ResponseEntity<?> listarGuitarras()
+    public ResponseEntity<List<Guitarra>> listarGuitarras()
     {
         List<Guitarra> listaGuitarras = servicioInstrumento.listarGuitarras();
-        if (!listaGuitarras.isEmpty())
-        {
-            return ResponseEntity.ok(listaGuitarras);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse(true, "No hay Guitarras"));
+        return ResponseEntity.ok(listaGuitarras);
+
     }
 
     @GetMapping(value = "/teclados")
-    public ResponseEntity<?> listarTeclados()
+    public ResponseEntity<List<Teclado>> listarTeclados()
     {
         List<Teclado> listaTeclados = servicioInstrumento.listarTeclados();
-        if (!listaTeclados.isEmpty())
-        {
-            return ResponseEntity.ok(listaTeclados);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse(true, "No hay teclados"));
+        return ResponseEntity.ok(listaTeclados);
+
     }
 
     @GetMapping(value = "/{codigo}")
@@ -107,17 +84,9 @@ public class InstrumentoController
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(true, "El codigo debe existir"));
         }
-        try
-        {
-            servicioInstrumento.editarInstrumento(codigo, instrumentoModificado);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "Instrumento editado correctamente"));
-        }
-        catch (NoSuchElementException e)
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, e.getMessage()));
-        }
+        servicioInstrumento.editarInstrumento(codigo, instrumentoModificado);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(false, "Instrumento editado correctamente"));
     }
 
     @DeleteMapping(value = "/{codigo}")
@@ -127,17 +96,9 @@ public class InstrumentoController
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(true, "El codigo debe existir"));
         }
-        try
-        {
-            servicioInstrumento.eliminarInstrumento(codigo);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "Instrumento eliminado correctamente"));
-        }
-        catch (NoSuchElementException e)
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, e.getMessage()));
-        }
+        servicioInstrumento.eliminarInstrumento(codigo);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(false, "Instrumento eliminado correctamente"));
     }
 
     @PostMapping(value = "/guitarras/{codigo}/fundas")
@@ -155,7 +116,7 @@ public class InstrumentoController
                     .body(new ApiResponse(true, "La guitarra no existe"));
         }
         Guitarra guitarra = (Guitarra) instrumento.get();
-        guitarra.setFundas(fundas);
+        guitarra.agregarFundas(fundas);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(false, "Fundas agregadas correctamente"));
     }
@@ -177,18 +138,10 @@ public class InstrumentoController
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(true, "La guitarra no existe"));
         }
-        try
-        {
-            Guitarra guitarra = (Guitarra) instrumento.get();
-            guitarra.editarFunda(codigoFunda, fundaModificada);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "Funda modificada correctamente"));
-        }
-        catch (NoSuchElementException e)
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, e.getMessage()));
-        }
+        Guitarra guitarra = (Guitarra) instrumento.get();
+        guitarra.editarFunda(codigoFunda, fundaModificada);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(false, "Funda modificada correctamente"));
     }
 
     @DeleteMapping(value = "/guitarras/{codigo}/fundas/{codigoFunda}")
@@ -208,17 +161,10 @@ public class InstrumentoController
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(true, "La guitarra no existe"));
         }
-        try
-        {
-            Guitarra guitarra = (Guitarra) instrumento.get();
-            guitarra.eliminarFunda(codigoFunda);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "Funda eliminada correctamente"));
-        }
-        catch (NoSuchElementException e)
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, e.getMessage()));
-        }
+        Guitarra guitarra = (Guitarra) instrumento.get();
+        guitarra.eliminarFunda(codigoFunda);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(false, "Funda eliminada correctamente"));
+
     }
 }
