@@ -4,18 +4,25 @@
  */
 package com.unibague.poctiendainstrumentos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 /**
  *
  * @author jorge
  */
 @Data
+@NoArgsConstructor
 public class Funda {
 
     private String codigo;
     private String nombre;
     private double precio;
+
+    @JsonIgnore
     private Guitarra guitarra;
 
     //constructor
@@ -45,6 +52,19 @@ public class Funda {
                 ", precio=" + precio +
                 ", Id guitarra=" + (guitarra != null ? guitarra.getCodigo() : "N/A") +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Funda funda = (Funda) o;
+        return Objects.equals(this.codigo, funda.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codigo);
     }
 
 }

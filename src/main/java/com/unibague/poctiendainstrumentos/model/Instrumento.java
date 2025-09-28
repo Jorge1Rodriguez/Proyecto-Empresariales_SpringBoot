@@ -4,8 +4,10 @@
  */
 package com.unibague.poctiendainstrumentos.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -15,31 +17,42 @@ import java.time.LocalDate;
  */
 
 @Data
+@NoArgsConstructor
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Guitarra.class, name = "guitarra"),
+        @JsonSubTypes.Type(value = Teclado.class, name = "teclado")
+})
 public abstract class Instrumento {
 
     private String codigo;
     private String nombre;
     private String marca;
-    private double precio;
+    private double precioBase;
     private int stock;
     private LocalDate fechaIngreso;
 
-    public Instrumento(String codigo, String nombre, String marca, double precio, int stock, LocalDate fechaIngreso){
+
+    public Instrumento(String codigo, String nombre, String marca, double precioBase, int stock, LocalDate fechaIngreso){
         this.codigo = codigo;
         this.nombre = nombre;
         this.marca = marca;
-        setPrecio(precio);
+        setPrecioBase(precioBase);
         setStock(stock);
         this.fechaIngreso = fechaIngreso;
     }
 
-    public abstract double calcularValor();
+    public abstract double calcularValor(double precioBase);
 
-    public void setPrecio(double precio){
+    public void setPrecioBase(double precio){
         if (precio < 0) {
             throw new IllegalArgumentException("Precio invalido");
         } else {
-            this.precio = precio;
+            this.precioBase = precio;
         }
     }
 
@@ -58,7 +71,7 @@ public abstract class Instrumento {
                 "codigo=" + codigo +
                 ", nombre=" + nombre +
                 ", marca=" + marca +
-                ", precio=" + precio +
+                ", precio=" + precioBase +
                 ", stock=" + stock +
                 ", fechaIngreso=" + fechaStr +
                 '}';

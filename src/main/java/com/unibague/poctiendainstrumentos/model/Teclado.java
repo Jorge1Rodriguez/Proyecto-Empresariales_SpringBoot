@@ -5,6 +5,7 @@
 package com.unibague.poctiendainstrumentos.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
  * @author jorge
  */
 @Data
+@NoArgsConstructor
 public class Teclado extends Instrumento implements IProgramable {
 
     private int numeroTeclas;
@@ -20,9 +22,9 @@ public class Teclado extends Instrumento implements IProgramable {
     private String sensibilidad;
 
     //Constructor
-    public Teclado(String codigo, String nombre, String marca, double precio, int stock, LocalDate fechaIngreso,
+    public Teclado(String codigo, String nombre, String marca, double precioBase, int stock, LocalDate fechaIngreso,
             int numeroTeclas, boolean digital, String sensibilidad) {
-        super(codigo, nombre, marca, precio, stock, fechaIngreso);
+        super(codigo, nombre, marca, precioBase, stock, fechaIngreso);
         setNumeroTeclas(numeroTeclas);
         this.digital = digital;
         this.sensibilidad = sensibilidad;
@@ -30,8 +32,8 @@ public class Teclado extends Instrumento implements IProgramable {
 
     //Metodos
     @Override
-    public double calcularValor() {
-        return getPrecio() + (isDigital() ? getPrecio() * 0.15 : 0);
+    public double calcularValor(double precioBase) {
+        return precioBase + (isDigital() ? precioBase * 0.15 : 0);
     }
 
     @Override

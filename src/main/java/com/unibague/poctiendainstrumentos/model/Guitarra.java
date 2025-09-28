@@ -5,13 +5,12 @@
 package com.unibague.poctiendainstrumentos.model;
 
 import lombok.Data;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -22,66 +21,87 @@ public class Guitarra extends Instrumento {
 
     private String tipo;
     private String materialCuerpo;
-    private List<Funda> fundas;
+    private List<Funda> fundas = new ArrayList<>();
 
     //Constructor
-    public Guitarra(String codigo, String nombre, String marca, double precio, int stock, LocalDate fechaIngreso,
+    public Guitarra(String codigo, String nombre, String marca, double precioBase, int stock, LocalDate fechaIngreso,
             String tipo, String materialCuerpo) {
-        super(codigo, nombre, marca, precio, stock, fechaIngreso);
+        super(codigo, nombre, marca, precioBase, stock, fechaIngreso);
         this.tipo = tipo;
         this.materialCuerpo = materialCuerpo;
-        this.fundas = new ArrayList<>();
     }
 
     //metodos
     @Override
-    public double calcularValor() {
-        double valor = getPrecio();
+    public double calcularValor(double precioBase) {
         for (Funda funda : fundas) {
-            valor += funda.getPrecio();
+            precioBase += funda.getPrecio();
         }
-        return valor;
+        return precioBase;
     }
 
-    public void agregarFunda(Funda funda) {
-        if (funda == null) {
+    public void agregarFunda(Funda funda)
+    {
+        if (funda == null)
+        {
             throw new IllegalArgumentException("La funda no puede ser nula");
         }
-        if (buscarFunda(funda.getCodigo()) != null) {
+        buscarFunda(funda.getCodigo()).ifPresent(i -> {
             throw new IllegalArgumentException("Ya existe una funda con este código");
-        }
+        });
         fundas.add(funda);
     }
 
+    public Optional<Funda> buscarFunda(String codigo) {
+        return fundas.stream()
+                .filter(i -> codigo.equalsIgnoreCase(i.getCodigo()))
+                .findFirst();
+    }
+
     public void eliminarFunda(String codigo) {
-         Funda funda = buscarFunda(codigo);
-            fundas.remove(funda);
-    }
-
-    public Funda buscarFunda(String codigo) {
-        for (Funda funda : fundas) {
-            if (funda.getCodigo().equalsIgnoreCase(codigo)) {
-                return funda;
-            }
+         Optional<Funda> funda = buscarFunda(codigo);
+        if (funda.isPresent())
+        {
+            fundas.remove(funda.get());
         }
-        throw new NoSuchElementException("No se encontró una funda con el código: " + codigo);
-    }
-
-    public void editarFunda(String codigo, Funda funda) {
-        if (funda == null) {
-            throw new IllegalArgumentException("La funda nueva no puede ser nula");
-        }
-        Funda fundaAEditar = buscarFunda(codigo);
-        if (fundaAEditar == null) {
+        else
+        {
             throw new NoSuchElementException("No se encontró una funda con el código: " + codigo);
         }
-        fundas.set(fundas.indexOf(fundaAEditar), funda);
+    }
+
+
+    public void editarFunda(String codigo, Funda funda)
+    {
+        Optional<Funda> fundaAEditar = buscarFunda(codigo);
+        if (fundaAEditar.isPresent())
+        {
+            fundas.set(fundas.indexOf(fundaAEditar.get()), funda);
+        }
+        else
+        {
+            throw new NoSuchElementException("No se encontró una funda con el código: " + codigo);
+        }
     }
 
     //getters y setters
     public List<Funda> getFundas() {
-        return Collections.unmodifiableList(fundas);
+        return fundas == null ? Collections.emptyList() : Collections.unmodifiableList(fundas);
     }
+
+
+    public void setFundas(List<Funda> fundas) {
+        if (fundas == null) {
+            this.fundas = new ArrayList<>();
+        } else {
+            this.fundas = new ArrayList<>(
+                    Stream.concat(getFundas().stream(), fundas.stream())
+                            .distinct()
+                            .toList()
+            );
+        }
+    }
+
 
     @Override
     public String toString() {

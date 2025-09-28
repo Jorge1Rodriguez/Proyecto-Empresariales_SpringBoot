@@ -14,10 +14,9 @@ import com.unibague.poctiendainstrumentos.model.Funda;
 import com.unibague.poctiendainstrumentos.model.Guitarra;
 import com.unibague.poctiendainstrumentos.model.Instrumento;
 import com.unibague.poctiendainstrumentos.model.Teclado;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * La clase {@code ServicioInstrumento} administra un conjunto de instrumentos
@@ -47,6 +46,8 @@ import java.util.NoSuchElementException;
  * @version 1.0
  * @since 2025
  */
+
+@Service
 public class ServicioInstrumento implements IServicioInstrumento {
 
     /**
@@ -83,10 +84,22 @@ public class ServicioInstrumento implements IServicioInstrumento {
         if (instrumento == null) {
             throw new IllegalArgumentException("El instrumento no puede ser nulo");
         }
-        if (buscarInstrumento(instrumento.getCodigo()) != null) {
-            throw new IllegalArgumentException("Ya existe un instrumento con este código");
+
+        buscarInstrumento(instrumento.getCodigo())
+                .ifPresent(i -> {
+                    throw new IllegalArgumentException("Ya existe un instrumento con este código");
+                });
+
+        if(instrumento instanceof Guitarra guitarra) {
+            if(guitarra.getFundas() != null) {
+                for(Funda funda : guitarra.getFundas()) {
+                    funda.setGuitarra(guitarra);
+                }
+            }
+            instrumentos.add(guitarra);
+        } else {
+            instrumentos.add(instrumento);
         }
-        instrumentos.add(instrumento);
     }
 
     /**
@@ -97,7 +110,6 @@ public class ServicioInstrumento implements IServicioInstrumento {
     @Override
     public List<Instrumento> listarInstrumentos() {
         return Collections.unmodifiableList(instrumentos);
-
     }
 
     /**
@@ -142,13 +154,10 @@ public class ServicioInstrumento implements IServicioInstrumento {
      * código proporcionado.
      */
     @Override
-    public Instrumento buscarInstrumento(String codigo) {
-        for (Instrumento instrumento : instrumentos) {
-            if (codigo.equalsIgnoreCase(instrumento.getCodigo())) {
-                return instrumento;
-            }
-        }
-        throw new NoSuchElementException("No se encontró un instrumento con el código: " + codigo);
+    public Optional<Instrumento> buscarInstrumento(String codigo) {
+        return instrumentos.stream()
+                .filter(i -> codigo.equalsIgnoreCase(i.getCodigo()))
+                .findFirst();
     }
 
     /**
@@ -161,9 +170,9 @@ public class ServicioInstrumento implements IServicioInstrumento {
      */
     @Override
     public void editarInstrumento(String codigo, Instrumento instrumento) {
-        Instrumento instrumentoaEditar = buscarInstrumento(codigo);
-        if (instrumentoaEditar != null) {
-            instrumentos.set(instrumentos.indexOf(instrumentoaEditar), instrumento);
+        Optional<Instrumento> instrumentoAEditar = buscarInstrumento(codigo);
+        if (instrumentoAEditar.isPresent()) {
+            instrumentos.set(instrumentos.indexOf(instrumentoAEditar.get()), instrumento);
         } else {
             throw new NoSuchElementException("No se encontró un instrumento con el código: " + codigo);
         }
@@ -178,9 +187,9 @@ public class ServicioInstrumento implements IServicioInstrumento {
      */
     @Override
     public void eliminarInstrumento(String codigo) {
-        Instrumento instrumentoaEliminar = buscarInstrumento(codigo);
-        if (instrumentoaEliminar != null) {
-            instrumentos.remove(instrumentoaEliminar);
+        Optional<Instrumento> instrumentoAEliminar = buscarInstrumento(codigo);
+        if (instrumentoAEliminar.isPresent()) {
+            instrumentos.remove(instrumentoAEliminar.get());
         } else {
             throw new NoSuchElementException("No se encontró un instrumento con el código: " + codigo);
         }
