@@ -4,6 +4,7 @@
  */
 package com.unibague.poctiendainstrumentos.service;
 
+import com.unibague.poctiendainstrumentos.dto.FiltroInstrumentoDTO;
 import com.unibague.poctiendainstrumentos.model.Funda;
 import com.unibague.poctiendainstrumentos.model.Guitarra;
 import com.unibague.poctiendainstrumentos.model.Instrumento;
@@ -37,4 +38,5 @@ public interface IServicioInstrumento {
 
     void eliminarFunda(String codigoGuitarra, String CodigoFunda);
 
+    List<Instrumento> filtrarInstrumentos(FiltroInstrumentoDTO filtro);
 }

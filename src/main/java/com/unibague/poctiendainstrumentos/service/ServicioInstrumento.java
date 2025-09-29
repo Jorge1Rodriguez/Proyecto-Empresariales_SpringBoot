@@ -10,6 +10,7 @@
  */
 package com.unibague.poctiendainstrumentos.service;
 
+import com.unibague.poctiendainstrumentos.dto.FiltroInstrumentoDTO;
 import com.unibague.poctiendainstrumentos.model.Funda;
 import com.unibague.poctiendainstrumentos.model.Guitarra;
 import com.unibague.poctiendainstrumentos.model.Instrumento;
@@ -17,6 +18,7 @@ import com.unibague.poctiendainstrumentos.model.Teclado;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * La clase {@code ServicioInstrumento} administra un conjunto de instrumentos
@@ -242,5 +244,37 @@ public class ServicioInstrumento implements IServicioInstrumento {
         }
     }
 
+    @Override
+    public List<Instrumento> filtrarInstrumentos(FiltroInstrumentoDTO filtro) {
+        Predicate<Instrumento> predicado = i -> true;
 
+        if (filtro.getNombre() != null) {
+            predicado = predicado.and(i -> i.getNombre().toLowerCase().contains(filtro.getNombre().toLowerCase()));
+        }
+        if (filtro.getMarca() != null) {
+            predicado = predicado.and(i -> i.getMarca().equalsIgnoreCase(filtro.getMarca()));
+        }
+        if (filtro.getPrecioMin() != null) {
+            predicado = predicado.and(i -> i.getPrecioBase() >= filtro.getPrecioMin());
+        }
+        if (filtro.getPrecioMax() != null) {
+            predicado = predicado.and(i -> i.getPrecioBase() <= filtro.getPrecioMax());
+        }
+        if (filtro.getStockMin() != null) {
+            predicado = predicado.and(i -> i.getStock() >= filtro.getStockMin());
+        }
+        if (filtro.getStockMax() != null) {
+            predicado = predicado.and(i -> i.getStock() <= filtro.getStockMax());
+        }
+        if (filtro.getTipoGuitarra() != null) {
+            predicado = predicado.and(i -> (i instanceof Guitarra guitarra) && guitarra.getTipo() == filtro.getTipoGuitarra());
+        }
+        if (filtro.getSensibilidad() != null) {
+            predicado = predicado.and(i -> (i instanceof Teclado teclado) && teclado.getSensibilidad() == filtro.getSensibilidad());
+        }
+
+        return instrumentos.stream()
+                .filter(predicado)
+                .toList();
+    }
 }

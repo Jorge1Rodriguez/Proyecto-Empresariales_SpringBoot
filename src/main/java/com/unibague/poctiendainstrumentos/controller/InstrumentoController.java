@@ -1,6 +1,7 @@
 package com.unibague.poctiendainstrumentos.controller;
 
 import com.unibague.poctiendainstrumentos.dto.ApiResponse;
+import com.unibague.poctiendainstrumentos.dto.FiltroInstrumentoDTO;
 import com.unibague.poctiendainstrumentos.model.Funda;
 import com.unibague.poctiendainstrumentos.model.Guitarra;
 import com.unibague.poctiendainstrumentos.model.Instrumento;
@@ -130,5 +131,11 @@ public class InstrumentoController
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(false, "Funda eliminada correctamente"));
 
+    }
+
+    @PostMapping(value = "/filtrar")
+    public ResponseEntity<List<Instrumento>> filtrarInstrumentos(@RequestBody FiltroInstrumentoDTO filtro) {
+        List<Instrumento> resultado = servicioInstrumento.filtrarInstrumentos(filtro);
+        return ResponseEntity.ok(resultado);
     }
 }

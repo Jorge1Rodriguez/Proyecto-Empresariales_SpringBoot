@@ -4,6 +4,7 @@
  */
 package com.unibague.poctiendainstrumentos.model;
 
+import com.unibague.poctiendainstrumentos.model.enums.SensibilidadTeclado;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,11 +20,11 @@ public class Teclado extends Instrumento implements IProgramable {
 
     private int numeroTeclas;
     private boolean digital;
-    private String sensibilidad;
+    private SensibilidadTeclado sensibilidad;
 
     //Constructor
     public Teclado(String codigo, String nombre, String marca, double precioBase, int stock, LocalDate fechaIngreso,
-            int numeroTeclas, boolean digital, String sensibilidad) {
+            int numeroTeclas, boolean digital, SensibilidadTeclado sensibilidad) {
         super(codigo, nombre, marca, precioBase, stock, fechaIngreso);
         setNumeroTeclas(numeroTeclas);
         this.digital = digital;

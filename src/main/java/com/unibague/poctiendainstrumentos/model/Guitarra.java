@@ -4,6 +4,7 @@
  */
 package com.unibague.poctiendainstrumentos.model;
 
+import com.unibague.poctiendainstrumentos.model.enums.TipoGuitarra;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,13 +20,13 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 public class Guitarra extends Instrumento {
 
-    private String tipo;
+    private TipoGuitarra tipo;
     private String materialCuerpo;
     private List<Funda> fundas = new ArrayList<>();
 
     //Constructor
     public Guitarra(String codigo, String nombre, String marca, double precioBase, int stock, LocalDate fechaIngreso,
-            String tipo, String materialCuerpo) {
+            TipoGuitarra tipo, String materialCuerpo) {
         super(codigo, nombre, marca, precioBase, stock, fechaIngreso);
         this.tipo = tipo;
         this.materialCuerpo = materialCuerpo;
