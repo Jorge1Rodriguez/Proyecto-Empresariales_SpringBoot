@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -22,6 +21,14 @@ public class InstrumentoController
 
     @Autowired
     private IServicioInstrumento servicioInstrumento;
+
+
+
+    private void validarCodigo(String codigo, String campo) {
+        if (codigo == null || codigo.isBlank()) {
+            throw new IllegalArgumentException("El " + campo + " debe existir y no estar vacío");
+        }
+    }
 
     @GetMapping(value = "/healthCheck")
     public String healthCheck()
@@ -63,10 +70,7 @@ public class InstrumentoController
     @GetMapping(value = "/{codigo}")
     public ResponseEntity<?> buscarInstrumento(@PathVariable("codigo") String codigo)
     {
-        if (codigo == null || codigo.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                 .body(new ApiResponse(true, "El codigo debe existir"));
-        }
+        validarCodigo(codigo, "código del instrumento");
         Optional<Instrumento> instrumento = servicioInstrumento.buscarInstrumento(codigo);
         if (instrumento.isEmpty())
         {
@@ -80,10 +84,7 @@ public class InstrumentoController
     public ResponseEntity<ApiResponse> editarInstrumento(@PathVariable("codigo") String codigo,
                                                          @RequestBody Instrumento instrumentoModificado)
     {
-        if (codigo == null || codigo.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El codigo debe existir"));
-        }
+        validarCodigo(codigo, "código del instrumento");
         servicioInstrumento.editarInstrumento(codigo, instrumentoModificado);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(false, "Instrumento editado correctamente"));
@@ -92,31 +93,18 @@ public class InstrumentoController
     @DeleteMapping(value = "/{codigo}")
     public ResponseEntity<ApiResponse> eliminarInstrumento(@PathVariable("codigo") String codigo)
     {
-        if (codigo == null || codigo.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El codigo debe existir"));
-        }
+        validarCodigo(codigo, "código del instrumento");
         servicioInstrumento.eliminarInstrumento(codigo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(false, "Instrumento eliminado correctamente"));
     }
 
     @PostMapping(value = "/guitarras/{codigo}/fundas")
-    public ResponseEntity<ApiResponse> agregarFundaGuitarra(@PathVariable("codigo") String codigo,
-                                                  @RequestBody List<Funda> fundas)
+    public ResponseEntity<ApiResponse> agregarFundas(@PathVariable("codigo") String codigo,
+                                                     @RequestBody List<Funda> fundas)
     {
-        if (codigo == null || codigo.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El codigo de la guitarra debe existir"));
-        }
-        Optional<Instrumento> instrumento = servicioInstrumento.buscarInstrumento(codigo);
-        if (instrumento.isEmpty())
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, "La guitarra no existe"));
-        }
-        Guitarra guitarra = (Guitarra) instrumento.get();
-        guitarra.agregarFundas(fundas);
+        validarCodigo(codigo, "código de la guitarra");
+        servicioInstrumento.agregarFundas(codigo, fundas);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(false, "Fundas agregadas correctamente"));
     }
@@ -125,21 +113,9 @@ public class InstrumentoController
     public ResponseEntity<ApiResponse> editarFunda(@PathVariable("codigo") String codigo,
                                                     @PathVariable("codigoFunda") String codigoFunda,
                                                     @RequestBody Funda fundaModificada) {
-        if (codigo == null || codigo.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El código de la guitarra debe existir"));
-        }
-        if (codigoFunda == null || codigoFunda.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El código de la funda debe existir"));
-        }
-        Optional<Instrumento> instrumento = servicioInstrumento.buscarInstrumento(codigo);
-        if (instrumento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, "La guitarra no existe"));
-        }
-        Guitarra guitarra = (Guitarra) instrumento.get();
-        guitarra.editarFunda(codigoFunda, fundaModificada);
+        validarCodigo(codigo, "código de la guitarra");
+        validarCodigo(codigoFunda, "código de la funda");
+        servicioInstrumento.editarFunda(codigo, codigoFunda, fundaModificada);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(false, "Funda modificada correctamente"));
     }
@@ -148,21 +124,9 @@ public class InstrumentoController
     public ResponseEntity<ApiResponse> eliminarFunda(@PathVariable("codigo") String codigo,
                                                      @PathVariable("codigoFunda") String codigoFunda)
     {
-        if (codigo == null || codigo.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El código de la guitarra debe existir"));
-        }
-        if (codigoFunda == null || codigoFunda.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(true, "El código de la funda debe existir"));
-        }
-        Optional<Instrumento> instrumento = servicioInstrumento.buscarInstrumento(codigo);
-        if (instrumento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(true, "La guitarra no existe"));
-        }
-        Guitarra guitarra = (Guitarra) instrumento.get();
-        guitarra.eliminarFunda(codigoFunda);
+        validarCodigo(codigo, "código de la guitarra");
+        validarCodigo(codigoFunda, "código de la funda");
+        servicioInstrumento.eliminarFunda(codigo, codigoFunda);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(false, "Funda eliminada correctamente"));
 

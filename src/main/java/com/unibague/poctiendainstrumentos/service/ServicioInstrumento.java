@@ -2,7 +2,7 @@
  * Clase: ServicioInstrumento
  * Proyecto: PoC Tienda de Instrumentos
  * Paquete: com.unibague.poctiendainstrumentos.service
- * 
+ *
  * Descripción:
  *   Clase de servicio que gestiona la colección de instrumentos musicales en la tienda.
  *   Implementa el patrón Singleton para asegurar que solo exista una instancia
@@ -65,7 +65,7 @@ public class ServicioInstrumento implements IServicioInstrumento {
         this.instrumentos = new ArrayList<>();
     }
 
-    public static ServicioInstrumento getInstance() {
+    public static synchronized ServicioInstrumento getInstance() {
         if (instancia == null) {
             instancia = new ServicioInstrumento();
         }
@@ -201,8 +201,12 @@ public class ServicioInstrumento implements IServicioInstrumento {
         {
             if (instrumento.get() instanceof Guitarra guitarra) {
                 guitarra.agregarFundas(fundas);
+            }else
+            {
+                throw new IllegalArgumentException("El código debe ser de una guitarra");
             }
-            throw new IllegalArgumentException("El codigo debe ser de una guitarra");
+        }else {
+            throw new NoSuchElementException("No se encontró una guitarra con el código: " + codigoGuitarra);
         }
     }
 
@@ -213,8 +217,12 @@ public class ServicioInstrumento implements IServicioInstrumento {
         {
             if (instrumento.get() instanceof Guitarra guitarra) {
                 guitarra.editarFunda(codigoFunda, funda);
+            }else
+            {
+                throw new IllegalArgumentException("El código debe ser de una guitarra");
             }
-            throw new IllegalArgumentException("El codigo debe ser de una guitarra");
+        }else {
+            throw new NoSuchElementException("No se encontró una guitarra con el código: " + codigoGuitarra);
         }
     }
 
@@ -225,8 +233,12 @@ public class ServicioInstrumento implements IServicioInstrumento {
         {
             if (instrumento.get() instanceof Guitarra guitarra) {
                 guitarra.eliminarFunda(codigoFunda);
+            }else
+            {
+                throw new IllegalArgumentException("El código debe ser de una guitarra");
             }
-            throw new IllegalArgumentException("El codigo debe ser de una guitarra");
+        }else {
+            throw new NoSuchElementException("No se encontró una guitarra con el código: " + codigoGuitarra);
         }
     }
 
