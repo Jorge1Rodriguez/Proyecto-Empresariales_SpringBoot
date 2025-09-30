@@ -21,52 +21,70 @@ import java.util.*;
 import java.util.function.Predicate;
 
 /**
- * La clase {@code ServicioInstrumento} administra un conjunto de instrumentos
- * musicales, permitiendo operaciones de agregar, listar, buscar, modificar y
- * eliminar.
+ * Servicio central para la gestión de instrumentos musicales en la tienda.
  *
  * <p>
- * Esta clase implementa el patrón <b>Singleton</b>, garantizando que en el
- * sistema exista una única instancia de servicio que centraliza la gestión de
- * los instrumentos.</p>
+ * Implementa un <b>patrón Singleton</b> para garantizar que solo exista una instancia
+ * activa en la aplicación, facilitando la administración y persistencia de los datos.
+ * </p>
  *
  * <p>
- * Las operaciones disponibles incluyen:
+ * Permite agregar, buscar, listar, editar y eliminar instrumentos, tanto de forma general
+ * como específica por tipo (guitarras, teclados). Además, gestiona las fundas asociadas
+ * a guitarras permitiendo su adición, edición y eliminación, y provee métodos para filtrar
+ * instrumentos según criterios flexibles.
+ * </p>
+ *
+ * <p>
+ * Es compatible con el uso en aplicaciones Spring gracias a la anotación {@code @Service}.
+ * </p>
+ *
+ * <p>
+ * Las operaciones principales incluyen:
  * <ul>
- * <li>Agregar un instrumento si no existe uno con el mismo código.</li>
- * <li>Listar todos los instrumentos (solo lectura).</li>
- * <li>Listar solo guitarras o teclados usando filtrado por tipo.</li>
- * <li>Buscar un instrumento por su código único.</li>
- * <li>Editar un instrumento existente.</li>
- * <li>Eliminar un instrumento por código.</li>
+ *   <li>Creación (agregar instrumento, agregar fundas)</li>
+ *   <li>Lectura (listar todos, listar por tipo, buscar por código, filtrar por criterios)</li>
+ *   <li>Actualización (editar instrumento, editar funda)</li>
+ *   <li>Eliminación (eliminar instrumento, eliminar funda)</li>
  * </ul>
+ * </p>
  *
  * <p>
- *
+ * Incluye validaciones y excepciones detalladas para evitar estados inconsistentes
+ * o que se añadan elementos duplicados o inválidos.
+ * </p>
  *
  * @author Jorge
  * @version 1.0
  * @since 2025
  */
-
 @Service
 public class ServicioInstrumento implements IServicioInstrumento {
 
     /**
-     * Colección de instrumentos administrados por el servicio.
+     * Lista centralizada de todos los instrumentos gestionados.
      */
     private List<Instrumento> instrumentos;
 
+    /**
+     * Instancia única del servicio (patrón Singleton).
+     */
     private static ServicioInstrumento instancia;
 
     /**
-     * Constructor privado para restringir la creación de instancias
-     * (Singleton). Inicializa la lista vacía de instrumentos.
+     * Constructor privado (patrón Singleton).
+     * Inicializa la lista vacía de instrumentos.
      */
     private ServicioInstrumento() {
         this.instrumentos = new ArrayList<>();
     }
 
+    /**
+     * Devuelve la instancia única del servicio.
+     * Usa sincronización para ser seguro en hilos.
+     *
+     * @return instancia única de ServicioInstrumento
+     */
     public static synchronized ServicioInstrumento getInstance() {
         if (instancia == null) {
             instancia = new ServicioInstrumento();
@@ -75,11 +93,13 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Agrega un nuevo instrumento al servicio.
+     * Agrega un instrumento a la colección.
+     * Garantiza que no se repita el código.
+     * Si la guitarra tiene fundas, asocia la guitarra (owner) a cada funda.
      *
      * @param instrumento Instrumento a agregar.
-     * @throws IllegalArgumentException Si el instrumento es {@code null} o si
-     * ya existe otro con el mismo código.
+     * @throws IllegalArgumentException si el instrumento es nulo.
+     * @throws IllegalStateException si ya existe un instrumento con ese código.
      */
     @Override
     public void agregarInstrumento(Instrumento instrumento) {
@@ -105,9 +125,10 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Devuelve una lista inmutable con todos los instrumentos disponibles.
+     * Lista todos los instrumentos disponibles.
+     * Devuelve una vista inmutable, solo lectura.
      *
-     * @return Lista de instrumentos (solo lectura).
+     * @return lista inmutable de instrumentos.
      */
     @Override
     public List<Instrumento> listarInstrumentos() {
@@ -115,10 +136,9 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Devuelve una lista de guitarras filtradas de la colección de
-     * instrumentos.
+     * Lista sólo los instrumentos que son guitarras.
      *
-     * @return Lista de guitarras.
+     * @return lista de guitarras.
      */
     @Override
     public List<Guitarra> listarGuitarras() {
@@ -132,9 +152,9 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Devuelve una lista de teclados filtrados de la colección de instrumentos.
+     * Lista sólo los instrumentos que son teclados.
      *
-     * @return Lista de teclados.
+     * @return lista de teclados.
      */
     @Override
     public List<Teclado> listarTeclados() {
@@ -148,10 +168,10 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Busca un instrumento en la colección, identificado por su código.
+     * Busca un instrumento específico por código.
      *
-     * @param codigo Código único del instrumento.
-     * @return El instrumento encontrado.
+     * @param codigo código único a buscar
+     * @return Optional con el instrumento si existe
      */
     @Override
     public Optional<Instrumento> buscarInstrumento(String codigo) {
@@ -161,12 +181,11 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Edita (reemplaza) un instrumento existente en la colección.
+     * Edita y reemplaza los datos de un instrumento, identificado por código.
      *
-     * @param codigo Código del instrumento a editar.
-     * @param instrumento Nuevo objeto con los datos actualizados.
-     * @throws NoSuchElementException Si no existe ningún instrumento con el
-     * código proporcionado.
+     * @param codigo código identificador
+     * @param instrumento nuevo objeto con datos a actualizar
+     * @throws NoSuchElementException si no existe instrumento con ese código
      */
     @Override
     public void editarInstrumento(String codigo, Instrumento instrumento) {
@@ -179,11 +198,10 @@ public class ServicioInstrumento implements IServicioInstrumento {
     }
 
     /**
-     * Elimina un instrumento de la colección según su código.
+     * Elimina un instrumento por código único.
      *
-     * @param codigo Código del instrumento a eliminar.
-     * @throws NoSuchElementException Si no existe ningún instrumento con ese
-     * código.
+     * @param codigo código identificador
+     * @throws NoSuchElementException si no existe instrumento con ese código
      */
     @Override
     public void eliminarInstrumento(String codigo) {
@@ -195,6 +213,14 @@ public class ServicioInstrumento implements IServicioInstrumento {
         }
     }
 
+    /**
+     * Agrega una lista de fundas a una guitarra por su código.
+     *
+     * @param codigoGuitarra código de la guitarra destino
+     * @param fundas lista de fundas a agregar
+     * @throws NoSuchElementException si no existe guitarra
+     * @throws IllegalArgumentException si el código no corresponde a una guitarra
+     */
     @Override
     public void agregarFundas(String codigoGuitarra, List<Funda> fundas)
     {
@@ -212,6 +238,15 @@ public class ServicioInstrumento implements IServicioInstrumento {
         }
     }
 
+    /**
+     * Edita los datos de una funda asociada a una guitarra específica.
+     *
+     * @param codigoGuitarra código de la guitarra
+     * @param codigoFunda código de la funda a editar
+     * @param funda nueva funda con datos actualizados
+     * @throws NoSuchElementException si no existe guitarra o funda
+     * @throws IllegalArgumentException si el código no corresponde a una guitarra
+     */
     @Override
     public void editarFunda(String codigoGuitarra, String codigoFunda, Funda funda) {
         Optional<Instrumento> instrumento = buscarInstrumento(codigoGuitarra);
@@ -228,6 +263,14 @@ public class ServicioInstrumento implements IServicioInstrumento {
         }
     }
 
+    /**
+     * Elimina una funda de una guitarra específica.
+     *
+     * @param codigoGuitarra código de la guitarra
+     * @param codigoFunda código de la funda a eliminar
+     * @throws NoSuchElementException si no existe guitarra o funda
+     * @throws IllegalArgumentException si el código no corresponde a una guitarra
+     */
     @Override
     public void eliminarFunda(String codigoGuitarra, String codigoFunda) {
         Optional<Instrumento> instrumento = buscarInstrumento(codigoGuitarra);
@@ -244,6 +287,13 @@ public class ServicioInstrumento implements IServicioInstrumento {
         }
     }
 
+    /**
+     * Filtra la lista de instrumentos según los criterios proporcionados en un DTO.
+     * Cada filtro es opcional y el método compone dinámicamente los predicados.
+     *
+     * @param filtro objeto DTO con los filtros (nombre, marca, precio, stock, tipo, sensibilidad, etc.)
+     * @return lista de instrumentos que cumplen los criterios.
+     */
     @Override
     public List<Instrumento> filtrarInstrumentos(FiltroInstrumentoDTO filtro) {
         Predicate<Instrumento> predicado = i -> true;
