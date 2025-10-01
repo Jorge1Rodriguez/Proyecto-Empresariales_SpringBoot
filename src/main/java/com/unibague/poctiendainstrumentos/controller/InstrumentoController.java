@@ -227,7 +227,7 @@ public class InstrumentoController
      * @param filtro DTO con filtros como nombre, marca, precio, stock, tipo, sensibilidad
      * @return lista de instrumentos que cumplen los criterios
      */
-    @PostMapping(value = "/filtrar")
+    @GetMapping(value = "/filtrar")
     public ResponseEntity<List<Instrumento>> filtrarInstrumentos(@RequestBody FiltroInstrumentoDTO filtro) {
         List<Instrumento> resultado = servicioInstrumento.filtrarInstrumentos(filtro);
         return ResponseEntity.ok(resultado);
