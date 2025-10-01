@@ -13,19 +13,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para facilitar APIs
-
-                .cors()  // Habilitar configuración CORS definidas externamente
-
+                .csrf(csrf -> csrf.disable())
+                .cors()
                 .and()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()    // Permitir sin autenticación OPTIONS (preflight)
-                        .requestMatchers("/publico/**").permitAll()                // Permitir sin auth rutas públicas
-                        .requestMatchers("/actuator/**").permitAll()               // Permitir sin auth healthcheck actuator
-                        .requestMatchers("/instrumentos/**").permitAll()           // Permitir sin auth acceso a instrumentos (POST/GET)
-                        .anyRequest().authenticated()                              // El resto requiere autenticación
-                );
-
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated() // Todo requiere autenticación
+                )
+                .httpBasic(); // ← AGREGA ESTO para habilitar Basic Auth
         return http.build();
     }
 }
